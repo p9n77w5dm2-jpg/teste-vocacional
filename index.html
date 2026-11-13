@@ -154,6 +154,19 @@
     padding: 0.25rem 0.65rem; color: var(--fg);
   }
 
+  .tips-toggle { margin-top: 0.75rem; }
+  .tips-toggle summary {
+    cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent);
+    list-style: none; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .tips-toggle summary::-webkit-details-marker { display: none; }
+  .tips-toggle summary::before { content: "+"; font-weight: 700; }
+  .tips-toggle[open] summary::before { content: "–"; }
+  .tips-toggle ul {
+    margin: 0.6rem 0 0; padding-left: 1.1rem; color: var(--fg-muted); font-size: 13px; line-height: 1.55;
+  }
+  .tips-toggle li { margin-bottom: 0.3rem; }
+
   .chart-block { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
   .chart-block h2 { font-size: 15px; margin: 0 0 1rem; color: var(--fg-muted); font-weight: 600; letter-spacing: 0.02em; }
 
@@ -549,23 +562,60 @@
     O: { name: "Abertura à Experiência", color: "var(--bf-o)",
       high: "Tens uma mente curiosa, criativa e aberta a novas ideias, experiências e formas de pensar. Gostas de explorar o desconhecido e de questionar o que já é dado como certo.",
       mid: "Equilibras curiosidade por coisas novas com apreço pela estabilidade e pelo que já conheces.",
-      low: "Preferes o familiar e o concreto a abstrações e novidades. Sentes-te mais confortável com rotinas e métodos já testados." },
+      low: "Preferes o familiar e o concreto a abstrações e novidades. Sentes-te mais confortável com rotinas e métodos já testados.",
+      tips: {
+        low: ["Experimenta uma atividade nova por semana — um livro, um género musical, uma rota diferente para casa.",
+              "Antes de rejeitares uma ideia pouco convencional, pergunta-te: \"e se isto funcionasse?\"",
+              "Reserva meia hora por semana para explorar um tema completamente fora da tua área."],
+        mid: ["Usa o que já conheces como base para experimentar pequenas novidades, sem teres de mudar tudo de uma vez.",
+              "Quando surgir um problema recorrente, pergunta-te se há uma forma diferente de o resolver."],
+        high: ["Usa a tua curiosidade para liderar projetos de inovação ou resolução criativa de problemas.",
+               "Combina novidade com foco: ideias novas valem mais quando as levas até ao fim."]
+      } },
     C: { name: "Conscienciosidade", color: "var(--bf-c)",
       high: "És organizado/a, disciplinado/a e orientado/a para objetivos. Cumpres compromissos e preocupas-te com rigor e detalhe.",
       mid: "Consegues ser organizado/a quando é preciso, mas também te permites ser flexível e espontâneo/a.",
-      low: "És mais espontâneo/a e flexível, preferindo adaptar-te ao momento a seguir planos rígidos." },
+      low: "És mais espontâneo/a e flexível, preferindo adaptar-te ao momento a seguir planos rígidos.",
+      tips: {
+        low: ["Usa listas de tarefas simples e marca cada passo à medida que o concluis.",
+              "Define prazos mais curtos do que o necessário para cada tarefa, para criar um sentido de urgência saudável.",
+              "Divide projetos grandes em passos pequenos e concretos, em vez de os encarares de uma vez só."],
+        mid: ["Identifica em que contextos costumas perder o foco e cria um lembrete ou rotina específica para esses momentos."],
+        high: ["Usa o teu rigor para liderar projetos complexos, mas deixa espaço para imprevistos sem te cobrares demasiado."]
+      } },
     E: { name: "Extroversão", color: "var(--bf-e)",
       high: "Ganhas energia com o contacto social, gostas de estar rodeado/a de pessoas e sentes-te confortável a ser o centro das atenções.",
       mid: "Equilibras momentos sociais com tempo sozinho/a, dependendo da situação.",
-      low: "Preferes ambientes calmos e recarregas energias sozinho/a. Sentes-te mais confortável em grupos pequenos ou a trabalhar de forma independente." },
+      low: "Preferes ambientes calmos e recarregas energias sozinho/a. Sentes-te mais confortável em grupos pequenos ou a trabalhar de forma independente.",
+      tips: {
+        low: ["Começa por interações sociais pequenas e previsíveis — uma reunião curta, um café com uma pessoa.",
+              "Prepara antecipadamente 2 ou 3 tópicos de conversa para situações sociais novas.",
+              "Dá-te permissão para recarregar sozinho/a depois de eventos sociais, sem culpa."],
+        mid: ["Escolhe conscientemente quando investir energia em situações sociais e quando preservar tempo sozinho/a."],
+        high: ["Usa a tua energia social para construir rede de contactos e liderar equipas, mas reserva tempo para ouvir, não só falar."]
+      } },
     A: { name: "Amabilidade", color: "var(--bf-a)",
       high: "És empático/a, cooperante e preocupas-te genuinamente com o bem-estar dos outros. Valorizas a harmonia nas relações.",
       mid: "Equilibras cooperação com assertividade, ajudando os outros sem perder de vista os teus próprios interesses.",
-      low: "Tendes a ser mais direto/a, competitivo/a e cético/a quanto às intenções alheias, colocando-te a ti primeiro quando necessário." },
+      low: "Tendes a ser mais direto/a, competitivo/a e cético/a quanto às intenções alheias, colocando-te a ti primeiro quando necessário.",
+      tips: {
+        low: ["Antes de criticares, tenta formular um comentário que também reconheça algo positivo.",
+              "Pratica ouvir até ao fim antes de responderes, mesmo quando discordas.",
+              "Pergunta-te como a tua decisão afeta as outras pessoas envolvidas, antes de a tomares."],
+        mid: ["Continua a equilibrar empatia com assertividade — não precisas de escolher sempre um dos dois lados."],
+        high: ["Usa a tua empatia para mediar conflitos, mas pratica dizer \"não\" quando os teus limites são ultrapassados."]
+      } },
     N: { name: "Estabilidade Emocional", color: "var(--bf-n)",
       high: "Mantens a calma sob pressão, recuperas rapidamente de contratempos e lidas bem com o stress do dia a dia.",
       mid: "Em geral lidas bem com o stress, mas há situações que te afetam mais do que gostarias.",
-      low: "Sentes as emoções de forma mais intensa, preocupando-te com frequência e reagindo fortemente a situações de stress." }
+      low: "Sentes as emoções de forma mais intensa, preocupando-te com frequência e reagindo fortemente a situações de stress.",
+      tips: {
+        low: ["Experimenta técnicas de respiração ou mindfulness nos momentos de maior tensão.",
+              "Escreve o que te preocupa antes de dormir, para \"esvaziar a cabeça\".",
+              "Quando sentires uma reação emocional forte, espera alguns minutos antes de responderes ou agires."],
+        mid: ["Identifica os teus principais gatilhos de stress e prepara com antecedência uma resposta para cada um."],
+        high: ["A tua calma é um recurso valioso em momentos de crise — usa-a para apoiar outros, mas confirma regularmente que também estás a cuidar de ti."]
+      } }
   };
 
   var QUESTIONS_BF = [
@@ -771,12 +821,15 @@
       var t = TRAITS_BF[k];
       var tier = tierLabel(pct[k]);
       var tierName = tier === "high" ? "Alto" : (tier === "low" ? "Baixo" : "Médio");
+      var tipsLabel = tier === "high" ? "Como tirar partido disto" : "Como desenvolver esta dimensão";
+      var tipsHtml = t.tips[tier].map(function (tip) { return "<li>" + tip + "</li>"; }).join("");
       var card = document.createElement("div");
       card.className = "profile-card";
       card.innerHTML =
         '<span class="tag" style="background:' + t.color + '; color:var(--surface);">' + tierName + ' · ' + pct[k] + '%</span>' +
         '<h3>' + t.name + '</h3>' +
-        '<p>' + t[tier] + '</p>';
+        '<p>' + t[tier] + '</p>' +
+        '<details class="tips-toggle"><summary>' + tipsLabel + '</summary><ul>' + tipsHtml + '</ul></details>';
       profilesEl.appendChild(card);
     });
   }
