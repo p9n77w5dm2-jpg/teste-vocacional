@@ -1,0 +1,654 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Bússola Vocacional</title>
+<style>
+  :root {
+    /* layout: cartão central único; uma pergunta de cada vez sobre um carril de progresso; */
+    /* ecrã de resultado troca para barras horizontais ordenadas, com os 2 perfis principais em destaque */
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --border: #e4e0d4;
+    --fg: #1f1d17;
+    --fg-muted: #6b6758;
+    --accent: #b5472f;
+    --accent-fg: #fff7ef;
+
+    --r: #7d6a4f;
+    --i: #2f6f6b;
+    --a: #a8456b;
+    --s: #c27a1e;
+    --e: #4d6d9c;
+    --c: #5c5748;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17160f;
+      --surface: #211f17;
+      --border: #38352a;
+      --fg: #ede8da;
+      --fg-muted: #a7a18e;
+      --accent: #e08363;
+      --accent-fg: #241208;
+      --r: #c2ad8a;
+      --i: #6fbdb7;
+      --a: #e293b4;
+      --s: #e8b45e;
+      --e: #9bb7e3;
+      --c: #b9b3a0;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17160f;
+    --surface: #211f17;
+    --border: #38352a;
+    --fg: #ede8da;
+    --fg-muted: #a7a18e;
+    --accent: #e08363;
+    --accent-fg: #241208;
+    --r: #c2ad8a;
+    --i: #6fbdb7;
+    --a: #e293b4;
+    --s: #e8b45e;
+    --e: #9bb7e3;
+    --c: #b9b3a0;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Inter, system-ui, sans-serif;
+    margin: 0;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 2.5rem;
+  }
+  h1, h2, h3 { font-family: "Space Grotesk", Inter, system-ui, sans-serif; font-weight: 600; text-wrap: balance; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--fg-muted); margin: 0 0 0.4rem;
+  }
+  .intro h1 { font-size: 28px; margin: 0 0 0.75rem; }
+  .intro p { color: var(--fg-muted); line-height: 1.6; margin: 0 0 1rem; }
+  .intro ul { color: var(--fg-muted); line-height: 1.7; padding-left: 1.2rem; margin: 0 0 1.75rem; }
+
+  button {
+    font-family: inherit; font-size: 15px; cursor: pointer; border-radius: 10px;
+  }
+  .btn-primary {
+    background: var(--accent); color: var(--accent-fg); border: none;
+    padding: 0.85rem 1.5rem; font-weight: 600;
+  }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-secondary {
+    background: transparent; color: var(--fg); border: 1px solid var(--border);
+    padding: 0.6rem 1.1rem;
+  }
+  .btn-secondary:hover { border-color: var(--fg-muted); }
+
+  .progress-rail {
+    height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 1.5rem;
+  }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.25s ease; }
+  .progress-label { font-size: 13px; color: var(--fg-muted); margin: 0 0 0.5rem; display: flex; justify-content: space-between; }
+
+  .q-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 2rem; min-height: 180px; display: flex; flex-direction: column; justify-content: center;
+  }
+  .q-text { font-size: 19px; line-height: 1.45; margin: 0 0 1.5rem; }
+  .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .scale button {
+    background: var(--bg); border: 1px solid var(--border); color: var(--fg);
+    padding: 0.7rem 0.3rem; font-size: 12px; line-height: 1.3; text-align: center; min-width: 0;
+  }
+  .scale button:hover { border-color: var(--accent); }
+  .scale button.chosen { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+
+  .nav-row { display: flex; justify-content: space-between; margin-top: 1.5rem; }
+
+  .result-head { text-align: center; margin-bottom: 2rem; }
+  .result-head .code {
+    font-family: "Space Grotesk", monospace; font-size: 42px; font-weight: 700; letter-spacing: 0.04em;
+    margin: 0.3rem 0;
+  }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bar-label { width: 108px; font-size: 13px; color: var(--fg-muted); flex-shrink: 0; }
+  .bar-track { flex: 1; min-width: 0; height: 14px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; }
+  .bar-pct { width: 38px; text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--fg-muted); flex-shrink: 0; }
+
+  .profile-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 1.5rem; margin-top: 1rem;
+  }
+  .profile-card .tag {
+    display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 0.2rem 0.6rem; border-radius: 99px; margin-bottom: 0.6rem;
+  }
+  .profile-card h3 { margin: 0 0 0.4rem; font-size: 18px; }
+  .profile-card p { margin: 0 0 0.6rem; color: var(--fg-muted); line-height: 1.55; font-size: 14px; }
+  .careers { display: flex; flex-wrap: wrap; gap: 6px; }
+  .careers span {
+    font-size: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 99px;
+    padding: 0.25rem 0.65rem; color: var(--fg);
+  }
+
+  .chart-block { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .chart-block h2 { font-size: 15px; margin: 0 0 1rem; color: var(--fg-muted); font-weight: 600; letter-spacing: 0.02em; }
+
+  footer-note { display: block; text-align: center; font-size: 12px; color: var(--fg-muted); margin-top: 2rem; }
+  [hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+<div class="wrap">
+
+  <section id="intro" class="intro">
+    <p class="eyebrow">Teste vocacional · modelo RIASEC</p>
+    <h1>Bússola Vocacional</h1>
+    <p>36 afirmações curtas para mapear o teu perfil de interesses profissionais segundo o modelo RIASEC (Holland) — Realista, Investigativo, Artístico, Social, Empreendedor e Convencional.</p>
+    <ul>
+      <li>Responde com sinceridade, pensando no que gostas de fazer, não no que achas que "deverias" gostar.</li>
+      <li>Não há respostas certas ou erradas.</li>
+      <li>Demora cerca de 5 minutos.</li>
+    </ul>
+    <button class="btn-primary" id="start-btn">Começar o teste</button>
+  </section>
+
+  <section id="quiz" hidden>
+    <p class="eyebrow" id="quiz-heading">Fase 1 · O teu perfil RIASEC</p>
+    <div class="progress-label">
+      <span id="progress-text">Pergunta 1 de 36</span>
+      <span id="progress-pct">3%</span>
+    </div>
+    <div class="progress-rail"><div class="progress-fill" id="progress-fill" style="width:3%"></div></div>
+    <div class="q-card">
+      <p class="q-text" id="q-text"></p>
+      <div class="scale" id="scale">
+        <button data-v="1">Discordo totalmente</button>
+        <button data-v="2">Discordo</button>
+        <button data-v="3">Neutro</button>
+        <button data-v="4">Concordo</button>
+        <button data-v="5">Concordo totalmente</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-secondary" id="back-btn">Voltar</button>
+      <button class="btn-secondary" id="restart-btn-quiz">Recomeçar</button>
+    </div>
+  </section>
+
+  <section id="result" hidden>
+    <div class="result-head">
+      <p class="eyebrow">O teu perfil</p>
+      <div class="code" id="result-code"></div>
+      <p style="color:var(--fg-muted); font-size:14px;" id="result-sub"></p>
+    </div>
+
+    <div class="chart-block">
+      <h2>Pontuação por perfil</h2>
+      <div id="bars"></div>
+    </div>
+
+    <div id="profiles"></div>
+
+    <div class="nav-row" style="justify-content:center; gap: 10px;">
+      <button class="btn-primary" id="deepen-btn">Aprofundar este resultado</button>
+    </div>
+    <div class="nav-row" style="justify-content:center; gap: 10px; margin-top: 0.6rem;">
+      <button class="btn-secondary" id="restart-btn">Refazer o teste</button>
+    </div>
+    <footer-note>Este teste é uma ferramenta de autoconhecimento inspirada no modelo RIASEC de John Holland — não substitui aconselhamento vocacional profissional.</footer-note>
+  </section>
+
+  <section id="subresult" hidden>
+    <div class="result-head">
+      <p class="eyebrow" id="sub-eyebrow">Dentro do teu perfil</p>
+      <h2 style="font-size:24px; margin: 0.2rem 0 0.4rem;" id="sub-title"></h2>
+      <p style="color:var(--fg-muted); font-size:14px;" id="sub-lead"></p>
+    </div>
+
+    <div class="chart-block">
+      <h2>Pontuação por sub-área</h2>
+      <div id="sub-bars"></div>
+    </div>
+
+    <div id="sub-profiles"></div>
+
+    <div class="nav-row" style="justify-content:center; gap: 10px;">
+      <button class="btn-secondary" id="back-to-result-btn">Ver resultado geral</button>
+    </div>
+    <div class="nav-row" style="justify-content:center; gap: 10px; margin-top: 0.6rem;">
+      <button class="btn-secondary" id="restart-btn-sub">Refazer o teste</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  var SUBAREAS = {
+    R: [
+      { key: "mec", name: "Engenharia & Manutenção", desc: "Gostas de perceber o funcionamento interno de máquinas e sistemas, e de diagnosticar e corrigir avarias técnicas.",
+        careers: ["Engenharia Mecânica/Eletrotécnica", "Técnico de manutenção industrial", "Automação"],
+        qs: ["Gosto de perceber o funcionamento interno de máquinas e sistemas complexos.",
+             "Sinto-me bem a diagnosticar e corrigir avarias técnicas.",
+             "Interesso-me por eletromecânica, automação ou manutenção industrial."] },
+      { key: "con", name: "Construção & Obras", desc: "Gostas de participar na construção de edifícios e estruturas, e de trabalhar fisicamente num estaleiro ou oficina.",
+        careers: ["Engenharia Civil", "Arquitetura técnica", "Topografia", "Mestre de obras"],
+        qs: ["Gosto de acompanhar ou participar na construção de edifícios e estruturas.",
+             "Interesso-me por desenho técnico, topografia ou planeamento de obras.",
+             "Sinto-me bem a trabalhar fisicamente num estaleiro ou oficina."] },
+      { key: "agr", name: "Agricultura & Ambiente", desc: "Gostas de trabalhar ao ar livre em contacto com a natureza, plantas, animais ou recursos naturais.",
+        careers: ["Engenharia Agronómica", "Gestão florestal", "Veterinária de produção", "Ambiente"],
+        qs: ["Gosto de trabalhar ao ar livre em contacto com a natureza.",
+             "Interesso-me por agricultura, florestas, recursos naturais ou sustentabilidade.",
+             "Sinto-me realizado a cuidar de plantas, animais ou terrenos."] },
+      { key: "tra", name: "Transportes & Operações", desc: "Gostas de conduzir, pilotar ou operar veículos, máquinas pesadas ou sistemas de transporte.",
+        careers: ["Piloto", "Marinha mercante", "Condução profissional", "Logística de transportes"],
+        qs: ["Interesso-me por condução, pilotagem ou operação de veículos e equipamentos.",
+             "Gosto de trabalhar com logística física de transporte de pessoas ou carga.",
+             "Sinto-me confortável a operar máquinas pesadas ou sistemas de transporte."] },
+      { key: "seg", name: "Segurança & Proteção", desc: "Gostas de proteger pessoas, bens ou instalações, e de agir sob pressão em situações de risco físico.",
+        careers: ["Bombeiros", "Forças de segurança", "Segurança industrial", "Proteção civil"],
+        qs: ["Interesso-me por segurança, proteção civil ou forças de autoridade.",
+             "Sinto-me bem a agir sob pressão em situações de risco físico.",
+             "Gosto de proteger pessoas, bens ou instalações."] }
+    ],
+    I: [
+      { key: "ti", name: "Tecnologia & Programação", desc: "Gostas de programar, criar sistemas e perceber como o software e as redes informáticas funcionam.",
+        careers: ["Engenharia de software", "Programação", "Cibersegurança", "DevOps/Infraestrutura"],
+        qs: ["Gosto de programar, criar sistemas ou resolver problemas com código.",
+             "Interesso-me por como o software e as redes informáticas funcionam.",
+             "Sinto-me bem a depurar e otimizar sistemas digitais."] },
+      { key: "dad", name: "Dados & Ciência de Dados", desc: "Gostas de analisar grandes quantidades de dados para encontrar padrões e transformar dados em conclusões úteis.",
+        careers: ["Ciência de dados", "Estatística", "Business Intelligence", "Investigação em IA"],
+        qs: ["Gosto de analisar grandes quantidades de dados para encontrar padrões.",
+             "Interesso-me por estatística, modelos preditivos ou inteligência artificial.",
+             "Sinto-me motivado a transformar dados em conclusões úteis."] },
+      { key: "sau", name: "Saúde & Ciências da Vida", desc: "Interessas-te pelo funcionamento do corpo humano e por investigar causas e tratamentos de problemas de saúde.",
+        careers: ["Medicina", "Biomedicina", "Farmácia", "Investigação biomédica"],
+        qs: ["Interesso-me por biologia, fisiologia ou o funcionamento do corpo humano.",
+             "Gosto de investigar causas e tratamentos de problemas de saúde.",
+             "Sinto-me motivado a contribuir para avanços médicos ou científicos."] },
+      { key: "aca", name: "Investigação Académica & Científica", desc: "Gostas de aprofundar temas complexos, testar teorias e desenvolver conhecimento científico.",
+        careers: ["Investigação científica", "Docência universitária", "Física/Química aplicada"],
+        qs: ["Gosto de ler artigos científicos e aprofundar temas complexos.",
+             "Interesso-me por física, química ou outras ciências exatas.",
+             "Sinto-me realizado a desenvolver ou testar teorias e experiências."] },
+      { key: "eng", name: "Engenharia & Tecnologia Aplicada", desc: "Gostas de aplicar conhecimento técnico para desenhar soluções de engenharia e otimizar sistemas complexos.",
+        careers: ["Engenharia Informática", "Engenharia Biomédica", "I&D tecnológico"],
+        qs: ["Gosto de aplicar conhecimento técnico para desenhar soluções de engenharia.",
+             "Interesso-me por como sistemas elétricos, mecânicos ou digitais se integram.",
+             "Sinto-me motivado a otimizar processos através de análise técnica."] }
+    ],
+    A: [
+      { key: "des", name: "Design Visual & Gráfico", desc: "Gostas de criar identidades visuais, interfaces e composições gráficas com impacto estético.",
+        careers: ["Design gráfico", "Design UX/UI", "Ilustração"],
+        qs: ["Gosto de criar composições visuais, logótipos ou layouts.",
+             "Interesso-me por como as cores, formas e tipografia comunicam uma ideia.",
+             "Sinto-me realizado a desenhar interfaces ou experiências visuais."] },
+      { key: "esc", name: "Escrita & Conteúdo", desc: "Gostas de contar histórias e comunicar ideias através da palavra escrita.",
+        careers: ["Jornalismo", "Copywriting", "Edição literária"],
+        qs: ["Gosto de escrever textos, histórias ou artigos.",
+             "Sinto-me confortável a comunicar ideias complexas de forma envolvente.",
+             "Interesso-me por jornalismo, literatura ou produção de conteúdos."] },
+      { key: "mus", name: "Música & Artes Performativas", desc: "Gostas de te expressar através da música, teatro ou dança, muitas vezes perante um público.",
+        careers: ["Música", "Teatro", "Dança"],
+        qs: ["Gosto de tocar, cantar ou compor música.",
+             "Sinto-me bem a atuar ou a expressar-me perante um público.",
+             "Interesso-me por teatro, dança ou artes performativas."] },
+      { key: "mod", name: "Moda & Estilismo", desc: "Interessas-te por estética pessoal, tendências e criação de peças ou looks.",
+        careers: ["Design de moda", "Estilismo", "Têxtil"],
+        qs: ["Interesso-me por moda, tendências e estilo pessoal.",
+             "Gosto de criar ou combinar peças de vestuário e acessórios.",
+             "Sinto-me atraído pela indústria têxtil ou da moda."] },
+      { key: "aud", name: "Audiovisual & Cinema", desc: "Gostas de contar histórias através de imagem em movimento, som e fotografia.",
+        careers: ["Realização", "Produção audiovisual", "Fotografia"],
+        qs: ["Gosto de criar ou editar vídeos, fotografia ou conteúdo audiovisual.",
+             "Interesso-me por cinema, realização ou produção de conteúdos visuais.",
+             "Sinto-me motivado a contar histórias através de imagem e som."] }
+    ],
+    S: [
+      { key: "edu", name: "Educação & Formação", desc: "Gostas de ensinar, explicar e ajudar outros a aprender e a desenvolver-se.",
+        careers: ["Professor", "Formador", "Coordenação pedagógica"],
+        qs: ["Gosto de explicar conceitos de forma clara para que outros aprendam.",
+             "Sinto-me realizado a acompanhar o progresso de alguém que estou a ensinar.",
+             "Interesso-me por educação, formação ou desenvolvimento de pessoas."] },
+      { key: "saucui", name: "Saúde & Cuidados", desc: "Gostas de cuidar do bem-estar físico de outras pessoas em contexto de saúde.",
+        careers: ["Enfermagem", "Terapia ocupacional", "Nutrição"],
+        qs: ["Sinto-me realizado a cuidar da saúde ou bem-estar físico de outras pessoas.",
+             "Interesso-me por enfermagem, terapias ou cuidados de saúde.",
+             "Sinto conforto em apoiar alguém em momentos de fragilidade física."] },
+      { key: "psi", name: "Psicologia & Apoio Emocional", desc: "Gostas de ouvir, compreender e apoiar emocionalmente as pessoas à tua volta.",
+        careers: ["Psicologia", "Aconselhamento", "Terapia familiar"],
+        qs: ["As pessoas costumam procurar-me para desabafar ou pedir conselhos.",
+             "Interesso-me por compreender o comportamento e as emoções humanas.",
+             "Sinto-me realizado a apoiar alguém emocionalmente numa dificuldade."] },
+      { key: "rh", name: "Recursos Humanos & Pessoas", desc: "Gostas de gerir relações, recrutamento e desenvolvimento de pessoas dentro de organizações.",
+        careers: ["Recursos Humanos", "Recrutamento", "Desenvolvimento organizacional"],
+        qs: ["Interesso-me por recrutamento, gestão de talento ou desenvolvimento de equipas.",
+             "Gosto de mediar conflitos ou melhorar a relação entre pessoas numa equipa.",
+             "Sinto-me confortável a avaliar o ajuste de uma pessoa a uma função."] },
+      { key: "acs", name: "Ação Social & Comunitária", desc: "Gostas de apoiar comunidades e grupos vulneráveis através de intervenção social.",
+        careers: ["Trabalho social", "Intervenção comunitária", "ONGs"],
+        qs: ["Interesso-me por causas sociais e apoio a comunidades vulneráveis.",
+             "Sinto-me motivado a participar em projetos de voluntariado ou ação comunitária.",
+             "Gosto de trabalhar diretamente no terreno com grupos em dificuldade."] }
+    ],
+    E: [
+      { key: "ges", name: "Gestão & Liderança", desc: "Gostas de coordenar equipas, tomar decisões e assumir responsabilidade por resultados.",
+        careers: ["Gestão de equipas", "Direção de projeto", "Operações"],
+        qs: ["Gosto de coordenar equipas e tomar decisões em nome de um grupo.",
+             "Sinto-me confortável a assumir responsabilidade por resultados de uma equipa.",
+             "Interesso-me por gestão, liderança ou direção de projetos."] },
+      { key: "ven", name: "Vendas & Negociação", desc: "Gostas de persuadir, negociar e fechar acordos com outras pessoas.",
+        careers: ["Vendas", "Gestão de contas", "Negociação comercial"],
+        qs: ["Sinto-me confortável a persuadir alguém a aceitar uma proposta.",
+             "Gosto do desafio de negociar e fechar um acordo.",
+             "Interesso-me por vendas, relação com clientes ou gestão de contas."] },
+      { key: "emp", name: "Empreendedorismo & Inovação", desc: "Gostas de criar algo novo, assumir riscos e construir projetos do zero.",
+        careers: ["Empreendedorismo", "Startups", "Desenvolvimento de negócio"],
+        qs: ["Gosto de criar projetos ou negócios do zero.",
+             "Sinto-me motivado a assumir riscos para transformar uma ideia em realidade.",
+             "Interesso-me por startups, inovação ou novos modelos de negócio."] },
+      { key: "mkt", name: "Marketing & Comunicação", desc: "Gostas de influenciar perceções, comunicar marcas e construir audiências.",
+        careers: ["Marketing", "Comunicação", "Gestão de marca"],
+        qs: ["Interesso-me por como as marcas comunicam e influenciam perceções.",
+             "Gosto de pensar em estratégias para chegar a um público-alvo.",
+             "Sinto-me motivado a promover ideias, produtos ou projetos."] },
+      { key: "dir", name: "Direito & Política", desc: "Gostas de argumentar, defender posições e influenciar decisões em contextos formais.",
+        careers: ["Direito", "Política", "Relações institucionais"],
+        qs: ["Gosto de argumentar e defender uma posição com base em factos ou regras.",
+             "Interesso-me por direito, política ou processos de decisão institucional.",
+             "Sinto-me confortável a representar os interesses de outra pessoa ou grupo."] }
+    ],
+    C: [
+      { key: "cfi", name: "Contabilidade & Finanças", desc: "Gostas de trabalhar com números, orçamentos e controlo financeiro rigoroso.",
+        careers: ["Contabilidade", "Finanças", "Controlo de gestão"],
+        qs: ["Gosto de trabalhar com números, orçamentos ou relatórios financeiros.",
+             "Sinto-me confortável a garantir que as contas fecham com rigor.",
+             "Interesso-me por contabilidade, finanças ou controlo de gestão."] },
+      { key: "adm", name: "Administração & Secretariado", desc: "Gostas de organizar processos administrativos, agendas e documentação.",
+        careers: ["Administração", "Secretariado", "Gestão de processos"],
+        qs: ["Gosto de organizar documentos, agendas ou processos administrativos.",
+             "Sinto-me bem a manter tudo arquivado e facilmente consultável.",
+             "Interesso-me por funções de apoio administrativo e organização de escritório."] },
+      { key: "aud2", name: "Auditoria & Compliance", desc: "Gostas de verificar conformidade, identificar erros e garantir que regras são cumpridas.",
+        careers: ["Auditoria", "Compliance", "Controlo de qualidade"],
+        qs: ["Gosto de verificar se processos ou documentos cumprem as regras definidas.",
+             "Sinto-me confortável a identificar erros ou desvios em sistemas organizados.",
+             "Interesso-me por auditoria, compliance ou controlo de qualidade."] },
+      { key: "log", name: "Logística & Operações", desc: "Gostas de planear e otimizar fluxos de stock, horários e recursos.",
+        careers: ["Logística", "Gestão de operações", "Cadeia de abastecimento"],
+        qs: ["Gosto de planear e otimizar fluxos de stock, horários ou recursos.",
+             "Sinto-me confortável a coordenar prazos e processos operacionais.",
+             "Interesso-me por logística, cadeia de abastecimento ou gestão de operações."] },
+      { key: "sis", name: "Dados & Sistemas de Informação", desc: "Gostas de organizar e manter sistemas de informação, bases de dados e registos estruturados.",
+        careers: ["Gestão de bases de dados", "Sistemas de informação", "Administração de sistemas"],
+        qs: ["Gosto de organizar informação em bases de dados ou sistemas estruturados.",
+             "Sinto-me confortável a manter registos atualizados e sem erros.",
+             "Interesso-me por sistemas de informação ou gestão documental digital."] }
+    ]
+  };
+
+  var TYPES = {
+    R: { name: "Realista", color: "var(--r)",
+      desc: "Gostas de resultados concretos e tangíveis: construir, reparar, mexer com ferramentas, máquinas ou natureza. Preferes ação a teoria.",
+      careers: ["Engenharia", "Eletricista/técnico", "Agricultura", "Arquitetura", "Piloto", "Desporto"] },
+    I: { name: "Investigativo", color: "var(--i)",
+      desc: "Gostas de entender como as coisas funcionam, analisar dados e resolver problemas complexos através da lógica e da investigação.",
+      careers: ["Investigação científica", "Medicina", "Programação", "Análise de dados", "Farmácia", "Economia"] },
+    A: { name: "Artístico", color: "var(--a)",
+      desc: "Valorizas a criatividade, a originalidade e a expressão pessoal. Preferes ambientes pouco estruturados onde possas inovar.",
+      careers: ["Design", "Escrita", "Música", "Arquitetura de interiores", "Cinema/fotografia", "Marketing criativo"] },
+    S: { name: "Social", color: "var(--s)",
+      desc: "Gostas de ajudar, ensinar e cuidar de pessoas. Sentes-te realizado em funções de contacto humano e apoio a outros.",
+      careers: ["Educação", "Psicologia", "Enfermagem", "Recursos humanos", "Trabalho social", "Formação"] },
+    E: { name: "Empreendedor", color: "var(--e)",
+      desc: "Gostas de liderar, persuadir e assumir riscos calculados. Sentes-te motivado por metas, negócios e influência sobre pessoas.",
+      careers: ["Gestão/liderança", "Vendas", "Empreendedorismo", "Direito", "Marketing", "Política"] },
+    C: { name: "Convencional", color: "var(--c)",
+      desc: "Gostas de ordem, precisão e estrutura. Preferes seguir procedimentos claros e trabalhar com dados, números ou sistemas organizados.",
+      careers: ["Contabilidade", "Administração", "Auditoria", "Logística", "Gestão de bases de dados", "Banca"] }
+  };
+
+  var QUESTIONS = [
+    ["R","Gosto de usar ferramentas ou máquinas para construir ou reparar coisas."],
+    ["R","Prefiro trabalhar com as mãos a passar o dia inteiro sentado numa secretária."],
+    ["R","Sinto-me bem a trabalhar ao ar livre, em obras, oficinas ou no terreno."],
+    ["R","Gosto de montar, desmontar ou perceber o funcionamento mecânico de objetos."],
+    ["R","Prefiro tarefas práticas e com resultado visível a planeamento abstrato."],
+    ["R","Interesso-me por áreas como mecânica, eletricidade, agricultura ou construção."],
+    ["I","Gosto de analisar dados ou informações para chegar a uma conclusão."],
+    ["I","Fico curioso sobre como e porquê as coisas funcionam."],
+    ["I","Gosto de resolver problemas complexos através da lógica e do raciocínio."],
+    ["I","Prefiro ler ou investigar a fundo um tema antes de agir."],
+    ["I","Interesso-me por ciência, tecnologia, matemática ou pesquisa."],
+    ["I","Gosto de testar hipóteses e tirar as minhas próprias conclusões."],
+    ["A","Gosto de criar coisas originais, sejam textos, imagens, música ou design."],
+    ["A","Prefiro ambientes flexíveis onde possa expressar-me livremente."],
+    ["A","Sinto-me bem a improvisar em vez de seguir um guião rígido."],
+    ["A","Interesso-me por arte, escrita, moda, música ou cinema."],
+    ["A","Gosto quando o meu trabalho tem um toque pessoal e criativo."],
+    ["A","Valorizo mais a originalidade do que seguir regras fixas."],
+    ["S","Gosto de ajudar outras pessoas a resolver os seus problemas."],
+    ["S","Sinto-me realizado quando ensino ou explico algo a alguém."],
+    ["S","Prefiro trabalhar em equipa e em contacto direto com pessoas."],
+    ["S","As pessoas costumam procurar-me para desabafar ou pedir conselhos."],
+    ["S","Interesso-me por educação, saúde, apoio social ou formação."],
+    ["S","Sinto-me bem a cuidar do bem-estar de outras pessoas."],
+    ["E","Gosto de liderar projetos e tomar decisões por uma equipa."],
+    ["E","Sinto-me confortável a persuadir ou negociar com outras pessoas."],
+    ["E","Gosto de assumir riscos para alcançar um objetivo ambicioso."],
+    ["E","Interesso-me por negócios, vendas, gestão ou política."],
+    ["E","Prefiro estar no comando a seguir instruções de outra pessoa."],
+    ["E","Sinto-me motivado por metas, competição e reconhecimento."],
+    ["C","Gosto de seguir procedimentos claros e bem definidos."],
+    ["C","Sinto-me confortável a organizar dados, ficheiros ou documentos."],
+    ["C","Prefiro ambientes previsíveis e bem estruturados a imprevisíveis."],
+    ["C","Dou atenção a detalhes e gosto de rigor nas tarefas."],
+    ["C","Interesso-me por contabilidade, administração ou gestão de sistemas."],
+    ["C","Sinto-me bem a trabalhar com regras, números ou checklists."]
+  ];
+
+  var introEl = document.getElementById("intro");
+  var quizEl = document.getElementById("quiz");
+  var resultEl = document.getElementById("result");
+  var subresultEl = document.getElementById("subresult");
+  var qText = document.getElementById("q-text");
+  var scale = document.getElementById("scale");
+  var quizHeading = document.getElementById("quiz-heading");
+  var progFill = document.getElementById("progress-fill");
+  var progText = document.getElementById("progress-text");
+  var progPct = document.getElementById("progress-pct");
+  var backBtn = document.getElementById("back-btn");
+
+  var lastMainOrder = null;
+  var current = null; // { items:[{tag,text}], answers:[], index, maxPerTag, onDone }
+
+  function renderQuestion() {
+    var item = current.items[current.index];
+    qText.textContent = item.text;
+    var pct = Math.round(((current.index + 1) / current.items.length) * 100);
+    progFill.style.width = pct + "%";
+    progText.textContent = "Pergunta " + (current.index + 1) + " de " + current.items.length;
+    progPct.textContent = pct + "%";
+    var buttons = scale.querySelectorAll("button");
+    buttons.forEach(function (b) {
+      b.classList.toggle("chosen", Number(b.dataset.v) === current.answers[current.index]);
+    });
+    backBtn.style.visibility = current.index === 0 ? "hidden" : "visible";
+  }
+
+  function goNext() {
+    if (current.index < current.items.length - 1) {
+      current.index++;
+      renderQuestion();
+    } else {
+      var answers = current.answers, items = current.items, onDone = current.onDone;
+      current = null;
+      onDone(answers, items);
+    }
+  }
+
+  scale.addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn || !current) return;
+    current.answers[current.index] = Number(btn.dataset.v);
+    renderQuestion();
+    setTimeout(goNext, 180);
+  });
+
+  backBtn.addEventListener("click", function () {
+    if (current && current.index > 0) { current.index--; renderQuestion(); }
+  });
+
+  function startQuiz(items, heading, onDone) {
+    current = { items: items, answers: new Array(items.length).fill(null), index: 0, onDone: onDone };
+    quizHeading.textContent = heading;
+    introEl.hidden = true;
+    resultEl.hidden = true;
+    subresultEl.hidden = true;
+    quizEl.hidden = false;
+    renderQuestion();
+  }
+
+  document.getElementById("start-btn").addEventListener("click", function () {
+    var items = QUESTIONS.map(function (q) { return { tag: q[0], text: q[1] }; });
+    startQuiz(items, "Fase 1 · O teu perfil RIASEC", showResult);
+  });
+
+  function resetAll() {
+    current = null;
+    lastMainOrder = null;
+    subresultEl.hidden = true;
+    resultEl.hidden = true;
+    quizEl.hidden = true;
+    introEl.hidden = false;
+  }
+  document.getElementById("restart-btn-quiz").addEventListener("click", resetAll);
+  document.getElementById("restart-btn").addEventListener("click", resetAll);
+  document.getElementById("restart-btn-sub").addEventListener("click", resetAll);
+  document.getElementById("back-to-result-btn").addEventListener("click", function () {
+    subresultEl.hidden = true;
+    resultEl.hidden = false;
+  });
+
+  function scoresByTag(answers, items, tagMax) {
+    var sums = {};
+    items.forEach(function (item, i) {
+      sums[item.tag] = (sums[item.tag] || 0) + (answers[i] || 3);
+    });
+    var pct = {};
+    Object.keys(sums).forEach(function (k) {
+      pct[k] = Math.round((sums[k] / tagMax) * 100);
+    });
+    return pct;
+  }
+
+  function showResult(answers, items) {
+    quizEl.hidden = true;
+    resultEl.hidden = false;
+
+    var pct = scoresByTag(answers, items, 6 * 5);
+    var order = Object.keys(pct).sort(function (a, b) { return pct[b] - pct[a]; });
+    lastMainOrder = order;
+    var code = order.slice(0, 3).join("");
+
+    document.getElementById("result-code").textContent = code;
+    document.getElementById("result-sub").textContent =
+      TYPES[order[0]].name + " + " + TYPES[order[1]].name + " é a tua combinação dominante.";
+
+    var barsEl = document.getElementById("bars");
+    barsEl.innerHTML = "";
+    order.forEach(function (k) {
+      var row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML =
+        '<span class="bar-label">' + TYPES[k].name + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + pct[k] + '%; background:' + TYPES[k].color + '"></span></span>' +
+        '<span class="bar-pct">' + pct[k] + '%</span>';
+      barsEl.appendChild(row);
+    });
+
+    var profilesEl = document.getElementById("profiles");
+    profilesEl.innerHTML = "";
+    order.slice(0, 2).forEach(function (k) {
+      var t = TYPES[k];
+      var card = document.createElement("div");
+      card.className = "profile-card";
+      var careersHtml = t.careers.map(function (c) { return "<span>" + c + "</span>"; }).join("");
+      card.innerHTML =
+        '<span class="tag" style="background:' + t.color + '; color:var(--surface);">' + k + ' · ' + t.name + '</span>' +
+        '<h3>' + t.name + '</h3>' +
+        '<p>' + t.desc + '</p>' +
+        '<div class="careers">' + careersHtml + '</div>';
+      profilesEl.appendChild(card);
+    });
+  }
+
+  document.getElementById("deepen-btn").addEventListener("click", function () {
+    if (!lastMainOrder) return;
+    var topType = lastMainOrder[0];
+    var subs = SUBAREAS[topType];
+    var items = [];
+    subs.forEach(function (sub) {
+      sub.qs.forEach(function (text) { items.push({ tag: sub.key, text: text }); });
+    });
+    startQuiz(items, "Fase 2 · A aprofundar o teu perfil " + TYPES[topType].name, function (answers, qItems) {
+      showSubResult(topType, answers, qItems);
+    });
+  });
+
+  function showSubResult(topType, answers, items) {
+    quizEl.hidden = true;
+    subresultEl.hidden = false;
+
+    var subs = SUBAREAS[topType];
+    var byKey = {};
+    subs.forEach(function (s) { byKey[s.key] = s; });
+
+    var pct = scoresByTag(answers, items, 3 * 5);
+    var order = Object.keys(pct).sort(function (a, b) { return pct[b] - pct[a]; });
+
+    document.getElementById("sub-eyebrow").textContent = "Dentro de " + TYPES[topType].name;
+    document.getElementById("sub-title").textContent = byKey[order[0]].name;
+    document.getElementById("sub-lead").textContent =
+      "A sub-área onde pontuaste mais alto dentro do teu perfil " + TYPES[topType].name + ".";
+
+    var barsEl = document.getElementById("sub-bars");
+    barsEl.innerHTML = "";
+    order.forEach(function (k) {
+      var row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML =
+        '<span class="bar-label">' + byKey[k].name + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + pct[k] + '%; background:' + TYPES[topType].color + '"></span></span>' +
+        '<span class="bar-pct">' + pct[k] + '%</span>';
+      barsEl.appendChild(row);
+    });
+
+    var profilesEl = document.getElementById("sub-profiles");
+    profilesEl.innerHTML = "";
+    order.slice(0, 2).forEach(function (k) {
+      var s = byKey[k];
+      var card = document.createElement("div");
+      card.className = "profile-card";
+      var careersHtml = s.careers.map(function (c) { return "<span>" + c + "</span>"; }).join("");
+      card.innerHTML =
+        '<span class="tag" style="background:' + TYPES[topType].color + '; color:var(--surface);">' + s.name + '</span>' +
+        '<h3>' + s.name + '</h3>' +
+        '<p>' + s.desc + '</p>' +
+        '<div class="careers">' + careersHtml + '</div>';
+      profilesEl.appendChild(card);
+    });
+  }
+})();
+</script>
