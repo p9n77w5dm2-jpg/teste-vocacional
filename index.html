@@ -18,6 +18,12 @@
     --s: #c27a1e;
     --e: #4d6d9c;
     --c: #5c5748;
+
+    --bf-o: #6a5aa8;
+    --bf-c: #2e7d5b;
+    --bf-e: #c2561e;
+    --bf-a: #2f7f9e;
+    --bf-n: #96503c;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -34,6 +40,11 @@
       --s: #e8b45e;
       --e: #9bb7e3;
       --c: #b9b3a0;
+      --bf-o: #a89ad8;
+      --bf-c: #7cc7a4;
+      --bf-e: #f0a06e;
+      --bf-a: #7fc3df;
+      --bf-n: #d19a86;
       color-scheme: dark;
     }
   }
@@ -51,6 +62,11 @@
     --s: #e8b45e;
     --e: #9bb7e3;
     --c: #b9b3a0;
+    --bf-o: #a89ad8;
+    --bf-c: #7cc7a4;
+    --bf-e: #f0a06e;
+    --bf-a: #7fc3df;
+    --bf-n: #d19a86;
     color-scheme: dark;
   }
 
@@ -143,13 +159,43 @@
 
   footer-note { display: block; text-align: center; font-size: 12px; color: var(--fg-muted); margin-top: 2rem; }
   [hidden] { display: none !important; }
+
+  .home h1 { font-size: 28px; margin: 0 0 0.5rem; }
+  .home > p { color: var(--fg-muted); line-height: 1.6; margin: 0 0 1.75rem; }
+  .home-grid { display: flex; flex-direction: column; gap: 12px; }
+  .home-card {
+    display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.25rem 1.5rem; color: var(--fg);
+  }
+  .home-card:hover { border-color: var(--fg-muted); }
+  .home-card .eyebrow { margin-bottom: 0.3rem; }
+  .home-card h3 { font-size: 17px; margin: 0 0 0.35rem; }
+  .home-card p { font-size: 14px; color: var(--fg-muted); line-height: 1.5; margin: 0; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 
 <div class="wrap">
 
-  <section id="intro" class="intro">
+  <section id="home" class="home">
+    <p class="eyebrow">Autoconhecimento</p>
+    <h1>Testes de Autoconhecimento</h1>
+    <p>Escolhe um teste para começar. Cada um demora cerca de 5 a 8 minutos.</p>
+    <div class="home-grid">
+      <button class="home-card" id="goto-riasec-btn">
+        <p class="eyebrow">Modelo RIASEC</p>
+        <h3>Teste Vocacional</h3>
+        <p>Descobre o teu perfil de interesses profissionais e as carreiras mais alinhadas contigo — com uma segunda fase que aprofunda as sub-áreas do teu perfil dominante.</p>
+      </button>
+      <button class="home-card" id="goto-bigfive-btn">
+        <p class="eyebrow">Modelo Big Five (OCEAN)</p>
+        <h3>Teste de Personalidade</h3>
+        <p>Mede cinco dimensões centrais da tua personalidade: Abertura, Conscienciosidade, Extroversão, Amabilidade e Estabilidade Emocional.</p>
+      </button>
+    </div>
+  </section>
+
+  <section id="intro" class="intro" hidden>
     <p class="eyebrow">Teste vocacional · modelo RIASEC</p>
     <h1>Bússola Vocacional</h1>
     <p>36 afirmações curtas para mapear o teu perfil de interesses profissionais segundo o modelo RIASEC (Holland) — Realista, Investigativo, Artístico, Social, Empreendedor e Convencional.</p>
@@ -159,6 +205,24 @@
       <li>Demora cerca de 5 minutos.</li>
     </ul>
     <button class="btn-primary" id="start-btn">Começar o teste</button>
+    <div class="nav-row" style="justify-content:flex-start;">
+      <button class="btn-secondary" id="home-btn-riasec">Voltar ao início</button>
+    </div>
+  </section>
+
+  <section id="intro-bf" class="intro" hidden>
+    <p class="eyebrow">Teste de personalidade · modelo Big Five (OCEAN)</p>
+    <h1>Mapa da Personalidade</h1>
+    <p>40 afirmações curtas para mapear as tuas cinco dimensões centrais de personalidade: Abertura à Experiência, Conscienciosidade, Extroversão, Amabilidade e Estabilidade Emocional.</p>
+    <ul>
+      <li>Responde com sinceridade sobre como és normalmente, não como gostarias de ser.</li>
+      <li>Não há perfis "bons" ou "maus" — cada dimensão tem vantagens em contextos diferentes.</li>
+      <li>Demora cerca de 6 minutos.</li>
+    </ul>
+    <button class="btn-primary" id="start-bf-btn">Começar o teste</button>
+    <div class="nav-row" style="justify-content:flex-start;">
+      <button class="btn-secondary" id="home-btn-bf">Voltar ao início</button>
+    </div>
   </section>
 
   <section id="quiz" hidden>
@@ -203,6 +267,7 @@
     </div>
     <div class="nav-row" style="justify-content:center; gap: 10px; margin-top: 0.6rem;">
       <button class="btn-secondary" id="restart-btn">Refazer o teste</button>
+      <button class="btn-secondary" id="home-btn-result">Voltar ao início</button>
     </div>
     <footer-note>Este teste é uma ferramenta de autoconhecimento inspirada no modelo RIASEC de John Holland — não substitui aconselhamento vocacional profissional.</footer-note>
   </section>
@@ -226,7 +291,29 @@
     </div>
     <div class="nav-row" style="justify-content:center; gap: 10px; margin-top: 0.6rem;">
       <button class="btn-secondary" id="restart-btn-sub">Refazer o teste</button>
+      <button class="btn-secondary" id="home-btn-subresult">Voltar ao início</button>
     </div>
+  </section>
+
+  <section id="result-bf" hidden>
+    <div class="result-head">
+      <p class="eyebrow">O teu perfil de personalidade</p>
+      <h2 style="font-size:24px; margin: 0.2rem 0 0.4rem;">Big Five (OCEAN)</h2>
+      <p style="color:var(--fg-muted); font-size:14px;" id="bf-sub"></p>
+    </div>
+
+    <div class="chart-block">
+      <h2>Pontuação por dimensão</h2>
+      <div id="bf-bars"></div>
+    </div>
+
+    <div id="bf-profiles"></div>
+
+    <div class="nav-row" style="justify-content:center; gap: 10px;">
+      <button class="btn-secondary" id="restart-btn-bf">Refazer o teste</button>
+      <button class="btn-secondary" id="home-btn-bfresult">Voltar ao início</button>
+    </div>
+    <footer-note>Este teste é uma ferramenta de autoconhecimento inspirada no modelo Big Five (OCEAN) — não substitui avaliação psicológica profissional.</footer-note>
   </section>
 
 </div>
@@ -458,10 +545,79 @@
     ["C","Sinto-me bem a trabalhar com regras, números ou checklists."]
   ];
 
+  var TRAITS_BF = {
+    O: { name: "Abertura à Experiência", color: "var(--bf-o)",
+      high: "Tens uma mente curiosa, criativa e aberta a novas ideias, experiências e formas de pensar. Gostas de explorar o desconhecido e de questionar o que já é dado como certo.",
+      mid: "Equilibras curiosidade por coisas novas com apreço pela estabilidade e pelo que já conheces.",
+      low: "Preferes o familiar e o concreto a abstrações e novidades. Sentes-te mais confortável com rotinas e métodos já testados." },
+    C: { name: "Conscienciosidade", color: "var(--bf-c)",
+      high: "És organizado/a, disciplinado/a e orientado/a para objetivos. Cumpres compromissos e preocupas-te com rigor e detalhe.",
+      mid: "Consegues ser organizado/a quando é preciso, mas também te permites ser flexível e espontâneo/a.",
+      low: "És mais espontâneo/a e flexível, preferindo adaptar-te ao momento a seguir planos rígidos." },
+    E: { name: "Extroversão", color: "var(--bf-e)",
+      high: "Ganhas energia com o contacto social, gostas de estar rodeado/a de pessoas e sentes-te confortável a ser o centro das atenções.",
+      mid: "Equilibras momentos sociais com tempo sozinho/a, dependendo da situação.",
+      low: "Preferes ambientes calmos e recarregas energias sozinho/a. Sentes-te mais confortável em grupos pequenos ou a trabalhar de forma independente." },
+    A: { name: "Amabilidade", color: "var(--bf-a)",
+      high: "És empático/a, cooperante e preocupas-te genuinamente com o bem-estar dos outros. Valorizas a harmonia nas relações.",
+      mid: "Equilibras cooperação com assertividade, ajudando os outros sem perder de vista os teus próprios interesses.",
+      low: "Tendes a ser mais direto/a, competitivo/a e cético/a quanto às intenções alheias, colocando-te a ti primeiro quando necessário." },
+    N: { name: "Estabilidade Emocional", color: "var(--bf-n)",
+      high: "Mantens a calma sob pressão, recuperas rapidamente de contratempos e lidas bem com o stress do dia a dia.",
+      mid: "Em geral lidas bem com o stress, mas há situações que te afetam mais do que gostarias.",
+      low: "Sentes as emoções de forma mais intensa, preocupando-te com frequência e reagindo fortemente a situações de stress." }
+  };
+
+  var QUESTIONS_BF = [
+    ["O","Tenho uma imaginação vívida.",false],
+    ["O","Gosto de explorar ideias e conceitos abstratos.",false],
+    ["O","Interesso-me por arte, música ou literatura.",false],
+    ["O","Gosto de experimentar atividades ou lugares novos.",false],
+    ["O","Prefiro rotinas previsíveis a novidades.",true],
+    ["O","Tenho curiosidade sobre temas fora da minha área.",false],
+    ["O","Acho fácil pensar fora da caixa.",false],
+    ["O","Sinto-me desconfortável com mudanças inesperadas.",true],
+    ["C","Sou organizado/a e gosto de planear antecipadamente.",false],
+    ["C","Cumpro prazos e compromissos com rigor.",false],
+    ["C","Presto atenção aos detalhes no que faço.",false],
+    ["C","Costumo deixar tarefas por terminar.",true],
+    ["C","Sou persistente até terminar o que começo.",false],
+    ["C","Gosto de ter um ambiente de trabalho arrumado.",false],
+    ["C","Ajo muitas vezes por impulso, sem planear.",true],
+    ["C","Sou alguém em quem se pode confiar para cumprir o combinado.",false],
+    ["E","Sinto-me com energia depois de estar com muita gente.",false],
+    ["E","Gosto de ser o centro das atenções.",false],
+    ["E","Falo facilmente com desconhecidos.",false],
+    ["E","Prefiro passar tempo sozinho/a a estar em grupo.",true],
+    ["E","Sinto-me confortável a liderar conversas em grupo.",false],
+    ["E","Recarrego energias mais estando sozinho/a do que em convívio.",true],
+    ["E","Procuro ativamente situações sociais e animadas.",false],
+    ["E","Sou reservado/a e falo pouco em grupos novos.",true],
+    ["A","Preocupo-me genuinamente com o bem-estar dos outros.",false],
+    ["A","Confio facilmente nas intenções das pessoas.",false],
+    ["A","Evito conflitos e procuro cooperar.",false],
+    ["A","Critico os outros com facilidade.",true],
+    ["A","Sinto empatia por quem está a passar dificuldades.",false],
+    ["A","Coloco os meus interesses à frente dos dos outros, mesmo que isso prejudique alguém.",true],
+    ["A","Sou paciente mesmo quando alguém me irrita.",false],
+    ["A","Costumo desconfiar das intenções alheias.",true],
+    ["N","Fico ansioso/a com facilidade perante imprevistos.",true],
+    ["N","Mantenho a calma mesmo sob pressão.",false],
+    ["N","Preocupo-me excessivamente com coisas que podem correr mal.",true],
+    ["N","O meu humor muda com frequência ao longo do dia.",true],
+    ["N","Recupero rapidamente depois de um contratempo.",false],
+    ["N","Sinto-me tenso/a ou nervoso/a em muitas situações do dia a dia.",true],
+    ["N","Lido bem com críticas sem me afetar demasiado.",false],
+    ["N","Sinto-me facilmente sobrecarregado/a emocionalmente.",true]
+  ];
+
+  var homeEl = document.getElementById("home");
   var introEl = document.getElementById("intro");
+  var introBfEl = document.getElementById("intro-bf");
   var quizEl = document.getElementById("quiz");
   var resultEl = document.getElementById("result");
   var subresultEl = document.getElementById("subresult");
+  var resultBfEl = document.getElementById("result-bf");
   var qText = document.getElementById("q-text");
   var scale = document.getElementById("scale");
   var quizHeading = document.getElementById("quiz-heading");
@@ -510,32 +666,58 @@
     if (current && current.index > 0) { current.index--; renderQuestion(); }
   });
 
+  function hideAllSections() {
+    homeEl.hidden = true;
+    introEl.hidden = true;
+    introBfEl.hidden = true;
+    quizEl.hidden = true;
+    resultEl.hidden = true;
+    subresultEl.hidden = true;
+    resultBfEl.hidden = true;
+  }
+
   function startQuiz(items, heading, onDone) {
     current = { items: items, answers: new Array(items.length).fill(null), index: 0, onDone: onDone };
     quizHeading.textContent = heading;
-    introEl.hidden = true;
-    resultEl.hidden = true;
-    subresultEl.hidden = true;
+    hideAllSections();
     quizEl.hidden = false;
     renderQuestion();
   }
+
+  document.getElementById("goto-riasec-btn").addEventListener("click", function () {
+    hideAllSections();
+    introEl.hidden = false;
+  });
+  document.getElementById("goto-bigfive-btn").addEventListener("click", function () {
+    hideAllSections();
+    introBfEl.hidden = false;
+  });
+  document.getElementById("home-btn-riasec").addEventListener("click", resetAll);
+  document.getElementById("home-btn-bf").addEventListener("click", resetAll);
+  document.getElementById("home-btn-result").addEventListener("click", resetAll);
+  document.getElementById("home-btn-subresult").addEventListener("click", resetAll);
+  document.getElementById("home-btn-bfresult").addEventListener("click", resetAll);
 
   document.getElementById("start-btn").addEventListener("click", function () {
     var items = QUESTIONS.map(function (q) { return { tag: q[0], text: q[1] }; });
     startQuiz(items, "Fase 1 · O teu perfil RIASEC", showResult);
   });
 
+  document.getElementById("start-bf-btn").addEventListener("click", function () {
+    var items = QUESTIONS_BF.map(function (q) { return { tag: q[0], text: q[1], reverse: q[2] }; });
+    startQuiz(items, "O teu perfil de personalidade (Big Five)", showResultBF);
+  });
+
   function resetAll() {
     current = null;
     lastMainOrder = null;
-    subresultEl.hidden = true;
-    resultEl.hidden = true;
-    quizEl.hidden = true;
-    introEl.hidden = false;
+    hideAllSections();
+    homeEl.hidden = false;
   }
   document.getElementById("restart-btn-quiz").addEventListener("click", resetAll);
   document.getElementById("restart-btn").addEventListener("click", resetAll);
   document.getElementById("restart-btn-sub").addEventListener("click", resetAll);
+  document.getElementById("restart-btn-bf").addEventListener("click", resetAll);
   document.getElementById("back-to-result-btn").addEventListener("click", function () {
     subresultEl.hidden = true;
     resultEl.hidden = false;
@@ -544,13 +726,59 @@
   function scoresByTag(answers, items, tagMax) {
     var sums = {};
     items.forEach(function (item, i) {
-      sums[item.tag] = (sums[item.tag] || 0) + (answers[i] || 3);
+      var raw = answers[i] || 3;
+      var value = item.reverse ? (6 - raw) : raw;
+      sums[item.tag] = (sums[item.tag] || 0) + value;
     });
     var pct = {};
     Object.keys(sums).forEach(function (k) {
       pct[k] = Math.round((sums[k] / tagMax) * 100);
     });
     return pct;
+  }
+
+  function tierLabel(pct) {
+    if (pct >= 60) return "high";
+    if (pct < 40) return "low";
+    return "mid";
+  }
+
+  function showResultBF(answers, items) {
+    quizEl.hidden = true;
+    resultBfEl.hidden = false;
+
+    var order = ["O", "C", "E", "A", "N"];
+    var pct = scoresByTag(answers, items, 8 * 5);
+
+    document.getElementById("bf-sub").textContent =
+      "A tua pontuação em cada uma das cinco dimensões centrais da personalidade.";
+
+    var barsEl = document.getElementById("bf-bars");
+    barsEl.innerHTML = "";
+    order.forEach(function (k) {
+      var row = document.createElement("div");
+      row.className = "bar-row";
+      row.innerHTML =
+        '<span class="bar-label">' + TRAITS_BF[k].name + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + pct[k] + '%; background:' + TRAITS_BF[k].color + '"></span></span>' +
+        '<span class="bar-pct">' + pct[k] + '%</span>';
+      barsEl.appendChild(row);
+    });
+
+    var profilesEl = document.getElementById("bf-profiles");
+    profilesEl.innerHTML = "";
+    order.forEach(function (k) {
+      var t = TRAITS_BF[k];
+      var tier = tierLabel(pct[k]);
+      var tierName = tier === "high" ? "Alto" : (tier === "low" ? "Baixo" : "Médio");
+      var card = document.createElement("div");
+      card.className = "profile-card";
+      card.innerHTML =
+        '<span class="tag" style="background:' + t.color + '; color:var(--surface);">' + tierName + ' · ' + pct[k] + '%</span>' +
+        '<h3>' + t.name + '</h3>' +
+        '<p>' + t[tier] + '</p>';
+      profilesEl.appendChild(card);
+    });
   }
 
   function showResult(answers, items) {
